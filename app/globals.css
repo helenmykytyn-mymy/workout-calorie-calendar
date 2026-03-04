@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900;
+}
+
+.todayHighlight {
+  position: relative;
+  background-color: rgba(255, 62, 165, 0.06);
+}
+
+.todayHighlight::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #ff3ea5;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 1;
+}
