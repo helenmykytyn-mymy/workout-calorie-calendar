@@ -153,11 +153,11 @@ export default function DayCell({
         <div className="mt-auto space-y-1 text-slate-700">
           <p>
             <span aria-hidden="true">🍽️ </span>
-            Eaten: {formatCalories(entry?.caloriesEaten)} kcal
+            Eaten: {formatCalories(entry?.caloriesEaten ?? null)} kcal
           </p>
           <p>
             {showBurnFire ? <span aria-hidden="true">🔥 </span> : null}
-            Burned: {formatCalories(entry?.caloriesBurned)} kcal
+            Burned: {formatCalories(entry?.caloriesBurned ?? null)} kcal
           </p>
           <p>
             Diff: {diff === null ? "—" : formatSignedKcal(diff)}
