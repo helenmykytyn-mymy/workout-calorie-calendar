@@ -29,23 +29,40 @@ const workoutFocusLabels: Record<WorkoutFocus, string> = {
   "Full body": "🧍‍♀️ Full body",
 };
 
-type EntryFormState = Omit<Entry, "caloriesBurned" | "caloriesEaten"> & {
-  workoutFocus: WorkoutFocus | "";
-  caloriesBurned: string;
+type EntryFormState = {
+  workoutType: WorkoutType;
+  workoutFocus?: WorkoutFocus;     // optional
+  workoutNote: string;
+
+  caloriesBurned: string;          // inputs are strings
   caloriesEaten: string;
   weightKg: string;
+
+  periodStatus: PeriodStatus;
 };
 
 function toFormState(entry?: Entry): EntryFormState {
   const base = entry ?? EMPTY_ENTRY;
+
   return {
-    ...base,
-    workoutFocus: base.workoutFocus ?? "",
+    workoutType: base.workoutType,
+    workoutFocus: base.workoutFocus ?? undefined,
+    workoutNote: base.workoutNote ?? "",
+
     caloriesBurned:
-      typeof base.caloriesBurned === "number" && Number.isFinite(base.caloriesBurned) ? String(base.caloriesBurned) : "",
+      typeof base.caloriesBurned === "number" && Number.isFinite(base.caloriesBurned)
+        ? String(base.caloriesBurned)
+        : "",
     caloriesEaten:
-      typeof base.caloriesEaten === "number" && Number.isFinite(base.caloriesEaten) ? String(base.caloriesEaten) : "",
-    weightKg: typeof base.weightKg === "number" && Number.isFinite(base.weightKg) ? String(base.weightKg) : "",
+      typeof base.caloriesEaten === "number" && Number.isFinite(base.caloriesEaten)
+        ? String(base.caloriesEaten)
+        : "",
+    weightKg:
+      typeof base.weightKg === "number" && Number.isFinite(base.weightKg)
+        ? String(base.weightKg)
+        : "",
+
+    periodStatus: base.periodStatus,
   };
 }
 
@@ -71,7 +88,7 @@ export default function EntryModal({ dateKey, initialEntry, onSave, onClear, onC
     const weight = form.weightKg.trim() === "" || !Number.isFinite(weightNumber) ? null : weightNumber;
     onSave(dateKey, {
       ...form,
-      workoutFocus: form.workoutFocus === "" ? undefined : form.workoutFocus,
+      workoutFocus: !form.workoutFocus ? undefined : form.workoutFocus,
       caloriesBurned: burned,
       caloriesEaten: eaten,
       weightKg: weight,
@@ -126,17 +143,23 @@ export default function EntryModal({ dateKey, initialEntry, onSave, onClear, onC
           <label className="block text-sm">
             <span className="mb-1 block text-slate-700">Workout focus</span>
             <select
-              className="w-full rounded border border-slate-300 p-2"
-              value={form.workoutFocus}
-              onChange={(e) => setForm((prev) => ({ ...prev, workoutFocus: e.target.value as WorkoutFocus | "" }))}
-            >
-              <option value="">None</option>
-              {workoutFocuses.map((focus) => (
-                <option key={focus} value={focus}>
-                  {workoutFocusLabels[focus]}
-                </option>
-              ))}
-            </select>
+  className="w-full rounded border border-slate-300 p-2"
+  value={form.workoutFocus ?? ""}
+  onChange={(e) => {
+    const v = e.target.value;
+    setForm((prev) => ({
+      ...prev,
+      workoutFocus: v ? (v as WorkoutFocus) : undefined,
+    }));
+  }}
+>
+  <option value="">None</option>
+  {workoutFocuses.map((focus) => (
+    <option key={focus} value={focus}>
+      {workoutFocusLabels[focus]}
+    </option>
+  ))}
+</select>
           </label>
 
           <label className="block text-sm">
