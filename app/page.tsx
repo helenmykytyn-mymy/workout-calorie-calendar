@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -67,7 +68,22 @@ function toDateKey(date: Date): string {
 const VIEW_MODE_STORAGE_KEY = "workout_calendar_view_mode_v1";
 type ViewMode = CalendarViewMode | "day";
 
-export default function Home() {useEffect(() => {
+export default function Home() {
+    const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.replace("/login");
+      }
+    };
+
+    checkUser();
+  }, [router]);
   const testSupabase = async () => {
     const { data, error } = await supabase
       .from("workouts")
@@ -78,7 +94,7 @@ export default function Home() {useEffect(() => {
   };
 
   testSupabase();
-}, []);
+
   const [entries, setEntries] = useState<EntriesByDate>({});
   const [weekWeights, setWeekWeights] = useState<WeekWeightsByStart>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
